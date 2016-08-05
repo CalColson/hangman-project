@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Hangman
 
 	def initialize(full_health)
@@ -47,12 +49,12 @@ class Hangman
 		until game_over? || game_win?
 			draw_screen
 			guess = '123'
-			unless (guess =~ /[a-z]/) == 0 && guess.length == 1
-				print 'Please guess a letter: '
+			until ((guess =~ /[a-z]/) == 0 && guess.length == 1) || guess == '!'
+				print 'Please guess a letter (or type [!] to save): '
 				guess = gets.chomp
 				puts; puts
 			end
-
+			return 'save' if guess == '!'
 			if @secret_word.include? guess
 				@right_guesses << guess
 			else
@@ -69,9 +71,28 @@ class Hangman
 end
 
 lives = 26
-hangman = Hangman.new lives
-answer = 'y'
+puts 'Would you like to continue an old game? If so, type [load]:'
+load_answer = gets.chomp
+if load_answer == 'load'
+	yaml = ''
+	File.open('saves/saved_file.yml') do |f|
+		yaml = f.read
+	end
+	hangman = YAML.load(yaml)
+else
+	hangman = Hangman.new lives
+end
+
+answer = hangman.start
 while answer == 'y'
 	hangman = Hangman.new lives
 	answer = hangman.start 	
+end
+
+if answer == 'save'
+	Dir.mkdir('saves') unless Dir.exists? 'saves'
+	yaml = YAML.dump(hangman)
+	save = File.new('saves/saved_file.yml', 'w')
+	save.write(yaml)
+	save.close
 end

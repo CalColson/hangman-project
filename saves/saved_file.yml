@@ -1,0 +1,6 @@
+--- !ruby/object:Hangman
+full_health: 26
+lives: 15
+secret_word: sophia
+right_guesses: ahiop
+wrong_guesses: bcdefgjklmn
